@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>카운트다운 타이머</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f0f0f0;
+      margin-top: 50px;
+    }
+    #timer {
+      font-size: 2em;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <h1>2025년 4월 3일 저녁 7시까지 남은 시간</h1>
+  <div id="timer"></div>
+
+  <script>
+    function updateTimer() {
+      const targetDate = new Date('2025-04-03T19:00:00');
+      const currentDate = new Date();
+      const timeDifference = targetDate - currentDate;
+
+      if (timeDifference <= 0) {
+        document.getElementById('timer').innerHTML = '카운트다운이 종료되었습니다.';
+        clearInterval(timerInterval);
+        return;
+      }
+
+      const days = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000);
+
+      document.getElementById('timer').innerHTML =
+        `${days}일 ${hours}시간 ${minutes}분 ${seconds}초`;
+    }
+
+    const timerInterval = setInterval(updateTimer, 1000);
+    updateTimer(); // 페이지 로드 시 타이머 즉시 표시
+  </script>
+</body>
+</html>
