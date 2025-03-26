@@ -17,6 +17,7 @@
       font-size: 2em;
       color: #333;
     }
+    /* 떨어지는 텍스트가 생성될 컨테이너 */
     .falling-text-container {
       position: fixed;
       top: 0;
@@ -27,25 +28,45 @@
       overflow: hidden;
       z-index: -1; /* 메인 컨텐츠 뒤에 배치 */
     }
+    /* 바닥에 쌓이는 텍스트를 표시할 컨테이너 */
+    .pile-container {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      pointer-events: none;
+      text-align: center;
+      padding-bottom: 10px;
+    }
+    /* 떨어지는 텍스트 스타일 (빨간색) */
     .falling-text {
       position: absolute;
       font-size: 1.5em;
       color: red;
-      opacity: 0; /* 초기 투명도 0으로 설정 */
-      animation: fall linear infinite;
+      opacity: 0; /* 초기 투명도 0 */
+      /* 한 번의 애니메이션 사이클 후 멈추도록 infinite 제거하고 forwards 사용 */
+      animation: fall linear forwards;
     }
+    /* 애니메이션 정의: 상단에서 하단까지 */
     @keyframes fall {
       0% {
         transform: translateY(-100px);
-        opacity: 0; /* 시작 시 투명 */
+        opacity: 0;
       }
       20% {
-        opacity: 1; /* 20% 지점에서 완전히 불투명 */
+        opacity: 1;
       }
       100% {
         transform: translateY(100vh);
-        opacity: 0; /* 끝날 때 다시 투명 */
+        opacity: 0;
       }
+    }
+    /* 바닥에 쌓인 텍스트 스타일 (파란색) */
+    .piled-text {
+      display: inline-block;
+      font-size: 1.5em;
+      color: blue;
+      margin: 2px;
     }
     .content {
       opacity: 0;
@@ -58,6 +79,7 @@
 </head>
 <body>
   <div class="falling-text-container"></div>
+  <div class="pile-container"></div>
 
   <div class="content">
     <h1>2025년 4월 3일 저녁 7시까지 남은 시간</h1>
@@ -66,10 +88,12 @@
   </div>
 
   <script>
+    // 페이지 로드 시 컨텐츠 페이드 인 효과
     window.addEventListener('load', () => {
       document.querySelector('.content').classList.add('loaded');
     });
 
+    // 카운트다운 타이머 업데이트 함수
     function updateTimer() {
       const targetDate = new Date('2025-04-03T19:00:00');
       const currentDate = new Date();
@@ -93,8 +117,10 @@
     const timerInterval = setInterval(updateTimer, 1000);
     updateTimer();
 
+    // 떨어지는 텍스트 생성 함수
     function createFallingText() {
-      const container = document.querySelector('.falling-text-container');
+      const fallingContainer = document.querySelector('.falling-text-container');
+      const pileContainer = document.querySelector('.pile-container');
       const names = ["현주형", "준서이헴", "은식", "뽁", "대승불교", "재샤쓰", "준수"];
       const text = names[Math.floor(Math.random() * names.length)];
       
@@ -102,22 +128,30 @@
       span.classList.add('falling-text');
       span.textContent = text;
       
+      // 화면 전체에서 랜덤한 수평 위치 지정
       const left = Math.random() * 100;
       span.style.left = left + '%';
       
+      // 애니메이션 지속시간과 시작 지연시간을 랜덤하게 설정
       const duration = 5 + Math.random() * 10;
       span.style.animationDuration = duration + 's';
       
       const delay = Math.random() * 10;
       span.style.animationDelay = delay + 's';
       
-      container.appendChild(span);
+      fallingContainer.appendChild(span);
       
-      setTimeout(() => {
+      // 애니메이션 종료 시, 해당 텍스트를 제거하고 바닥에 파란색 텍스트로 추가
+      span.addEventListener('animationend', function() {
         span.remove();
-      }, (duration + delay) * 1000);
+        const piledSpan = document.createElement('span');
+        piledSpan.classList.add('piled-text');
+        piledSpan.textContent = text;
+        pileContainer.appendChild(piledSpan);
+      });
     }
 
+    // 0.5초마다 새로운 떨어지는 텍스트 생성
     setInterval(createFallingText, 500);
   </script>
 </body>
