@@ -9,19 +9,53 @@
       text-align: center;
       background-color: #f0f0f0;
       margin-top: 50px;
+      position: relative;
+      overflow: hidden;
     }
     #timer {
       font-size: 2em;
       color: #333;
     }
+    /* 배경에 떨어지는 글씨를 위한 컨테이너 */
+    .falling-text-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: -1; /* 메인 컨텐츠 뒤에 배치 */
+    }
+    /* 떨어지는 텍스트 스타일과 애니메이션 (색상: 빨간색) */
+    .falling-text {
+      position: absolute;
+      font-size: 1.5em;
+      color: red;
+      animation: fall linear infinite;
+    }
+    @keyframes fall {
+      0% {
+        transform: translateY(-100px);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(100vh);
+        opacity: 0;
+      }
+    }
   </style>
 </head>
 <body>
+  <!-- 배경 애니메이션 컨테이너 -->
+  <div class="falling-text-container"></div>
+
   <h1>2025년 4월 3일 저녁 7시까지 남은 시간</h1>
-   <h1>현주형,준서이헴,은식,뽁,대승불교,재샤쓰,준수</h1>
+  <h1>현주형,준서이헴,은식,뽁,대승불교,재샤쓰,준수</h1>
   <div id="timer"></div>
 
   <script>
+    // 카운트다운 타이머 코드
     function updateTimer() {
       const targetDate = new Date('2025-04-03T19:00:00');
       const currentDate = new Date();
@@ -44,6 +78,41 @@
 
     const timerInterval = setInterval(updateTimer, 1000);
     updateTimer(); // 페이지 로드 시 타이머 즉시 표시
+
+    // 배경에 떨어지는 글씨 애니메이션 코드
+    function createFallingText() {
+      const container = document.querySelector('.falling-text-container');
+      // 주어진 이름 목록
+      const names = ["현주형", "준서이헴", "은식", "뽁", "대승불교", "재샤쓰", "준수"];
+      // 이름 목록에서 랜덤하게 선택
+      const text = names[Math.floor(Math.random() * names.length)];
+      
+      const span = document.createElement('span');
+      span.classList.add('falling-text');
+      span.textContent = text;
+      
+      // 랜덤한 수평 위치 설정 (화면 전체)
+      const left = Math.random() * 100;
+      span.style.left = left + '%';
+      
+      // 랜덤 애니메이션 지속시간 (5초 ~ 15초)
+      const duration = 5 + Math.random() * 10;
+      span.style.animationDuration = duration + 's';
+      
+      // 랜덤 애니메이션 시작 지연 시간 (0초 ~ 10초)
+      const delay = Math.random() * 10;
+      span.style.animationDelay = delay + 's';
+      
+      container.appendChild(span);
+      
+      // 애니메이션 주기가 끝나면 DOM에서 제거하여 메모리 관리
+      setTimeout(() => {
+        span.remove();
+      }, (duration + delay) * 1000);
+    }
+
+    // 0.5초마다 새로운 떨어지는 글씨 생성
+    setInterval(createFallingText, 500);
   </script>
 </body>
 </html>
