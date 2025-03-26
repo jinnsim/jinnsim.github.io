@@ -17,7 +17,31 @@
       font-size: 2em;
       color: #333;
     }
-    /* 떨어지는 텍스트가 생성될 컨테이너 */
+    /* 배경 이미지 컨테이너 (가장 뒤에 표시) */
+    .background-images {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -2;
+      pointer-events: none;
+    }
+    .background-images img {
+      position: absolute;
+      opacity: 0.3; /* 낮은 투명도로 배경 이미지 효과 */
+    }
+    .menu-image {
+      left: 10%;
+      bottom: 20%;
+      width: 30%;
+    }
+    .map-image {
+      right: 10%;
+      bottom: 20%;
+      width: 30%;
+    }
+    /* 떨어지는 텍스트 컨테이너 */
     .falling-text-container {
       position: fixed;
       top: 0;
@@ -26,9 +50,9 @@
       height: 100%;
       pointer-events: none;
       overflow: hidden;
-      z-index: -1; /* 메인 컨텐츠 뒤에 배치 */
+      z-index: -1; /* 배경 이미지 위, 컨텐츠 뒤 */
     }
-    /* 바닥에 쌓이는 텍스트를 표시할 컨테이너 */
+    /* 바닥에 쌓이는 텍스트 컨테이너 */
     .pile-container {
       position: fixed;
       bottom: 0;
@@ -43,11 +67,9 @@
       position: absolute;
       font-size: 1.5em;
       color: red;
-      opacity: 0; /* 초기 투명도 0 */
-      /* 한 번의 애니메이션 사이클 후 멈추도록 infinite 제거하고 forwards 사용 */
+      opacity: 0; /* 초기 투명 */
       animation: fall linear forwards;
     }
-    /* 애니메이션 정의: 상단에서 하단까지 */
     @keyframes fall {
       0% {
         transform: translateY(-100px);
@@ -78,6 +100,13 @@
   </style>
 </head>
 <body>
+  <!-- 배경 이미지 컨테이너 -->
+  <div class="background-images">
+    <!-- 실제 이미지 URL로 src 수정 -->
+    <img src="https://mblogthumb-phinf.pstatic.net/MjAyNDA3MTNfMjc3/MDAxNzIwODI4NDE5NDQz.eonliuZzlleiXIF4rRIg4JX2vcPRfh8tjKtJfUw_cDgg.bfrIHJmAyUB5T8K_FWP2MZFOjlztYHHfjxuEyT4V8Nsg.JPEG/SE-f41677c9-1c0f-40ac-94ad-566c0f90a40d.jpg?type=w800" alt="숙대피기 대표메뉴" class="menu-image">
+    <img src="https://simg.pstatic.net/static.map/v2/map/staticmap.bin?caller=smarteditor&markers=color%3A0x11cc73%7Csize%3Amid%7Cpos%3A126.973113%2037.543542%7CviewSizeRatio%3A0.7%7Ctype%3Ad&w=562&h=300&scale=2&dataversion=173.30" alt="약도" class="map-image">
+  </div>
+
   <div class="falling-text-container"></div>
   <div class="pile-container"></div>
 
@@ -156,3 +185,4 @@
   </script>
 </body>
 </html>
+``
