@@ -97,23 +97,47 @@
     .content.loaded {
       opacity: 1;
     }
+    /* 웹채팅 컨테이너 스타일 */
+    .chat-container {
+      position: fixed;
+      bottom: 10px;
+      right: 10px;
+      width: 320px;
+      height: 480px;
+      border: 1px solid #ccc;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      z-index: 1000;
+      background-color: #fff;
+    }
+    .chat-container iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
   </style>
 </head>
 <body>
   <!-- 배경 이미지 컨테이너 -->
   <div class="background-images">
-    <!-- 실제 이미지 URL로 src 수정 -->
     <img src="https://mblogthumb-phinf.pstatic.net/MjAyNDA3MTNfMjc3/MDAxNzIwODI4NDE5NDQz.eonliuZzlleiXIF4rRIg4JX2vcPRfh8tjKtJfUw_cDgg.bfrIHJmAyUB5T8K_FWP2MZFOjlztYHHfjxuEyT4V8Nsg.JPEG/SE-f41677c9-1c0f-40ac-94ad-566c0f90a40d.jpg?type=w800" alt="숙대피기 대표메뉴" class="menu-image">
     <img src="https://simg.pstatic.net/static.map/v2/map/staticmap.bin?caller=smarteditor&markers=color%3A0x11cc73%7Csize%3Amid%7Cpos%3A126.973113%2037.543542%7CviewSizeRatio%3A0.7%7Ctype%3Ad&w=562&h=300&scale=2&dataversion=173.30" alt="약도" class="map-image">
   </div>
 
+  <!-- 떨어지는 텍스트와 바닥에 쌓이는 텍스트 컨테이너 -->
   <div class="falling-text-container"></div>
   <div class="pile-container"></div>
 
+  <!-- 메인 컨텐츠 -->
   <div class="content">
     <h1>2025년 4월 3일 저녁 7시까지 남은 시간</h1>
     <h1>현주형,준서이헴,은식,뽁,대승불교,재샤쓰,준수</h1>
     <div id="timer"></div>
+  </div>
+
+  <!-- 웹채팅 iframe 컨테이너 -->
+  <div class="chat-container">
+    <!-- tlk.io 공개채팅 방 예시 (채팅 방 이름은 원하는 대로 변경 가능) -->
+    <iframe src="https://tlk.io/sukdaepigi" title="Web Chat"></iframe>
   </div>
 
   <script>
@@ -185,4 +209,3 @@
   </script>
 </body>
 </html>
-``
