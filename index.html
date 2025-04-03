@@ -29,35 +29,12 @@
     }
     .background-images img {
       position: absolute;
-      opacity: 0.3; /* 낮은 투명도로 배경 이미지 효과 */
-    }
-    .menu-image {
-      left: 10%;
-      bottom: 20%;
-      width: 30%;
-    }
-    .map-image {
-      right: 10%;
-      bottom: 20%;
-      width: 30%;
-    }
-    /* 가로 배경 이미지 컨테이너 */
-    .horizontal-background {
-      position: fixed;
-      top: 0;
-      left: 0;
       width: 100%;
       height: 100%;
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      z-index: -3;
-      pointer-events: none;
-    }
-    .horizontal-background img {
-      max-width: 30%;
-      height: auto;
-      opacity: 0.3;
+      object-fit: cover;
+      opacity: 0.3; /* 낮은 투명도로 배경 이미지 효과 */
+      top: 0;
+      left: 0;
     }
     /* 떨어지는 텍스트 컨테이너 */
     .falling-text-container {
@@ -118,12 +95,96 @@
   </style>
 </head>
 <body>
-  <!-- 배경 이미지 컨테이너 -->
+  <!-- 배경 이미지 컨테이너: 하나의 img 태그 사용 -->
   <div class="background-images">
-  
-    <img src="1.png" alt="Background 1">
-    <img src="2.png" alt="Background 2">
-    <img src="3.png" alt="Background 3">
+    <img id="bg-image" src="1.png" alt="Background">
   </div>
 
-  <!-- 떨어지는 텍스트와 바닥에
+  <!-- 떨어지는 텍스트와 바닥에 쌓이는 텍스트 컨테이너 -->
+  <div class="falling-text-container"></div>
+  <div class="pile-container"></div>
+
+  <!-- 메인 컨텐츠 -->
+  <div class="content">
+    <h1>2025년 4월 3일 저녁 7시까지 남은 시간</h1>
+    <h1>현주형,준서이헴,은식,뽁,대승불교,재샤쓰,준수</h1>
+    <div id="timer"></div>
+  </div>
+
+  <script>
+    // 페이지 로드 시 컨텐츠 페이드 인 효과
+    window.addEventListener('load', () => {
+      document.querySelector('.content').classList.add('loaded');
+    });
+
+    // 카운트다운 타이머 업데이트 함수
+    function updateTimer() {
+      const targetDate = new Date('2025-04-03T19:00:00');
+      const currentDate = new Date();
+      const timeDifference = targetDate - currentDate;
+
+      if (timeDifference <= 0) {
+        document.getElementById('timer').innerHTML = '카운트다운이 종료되었습니다.';
+        clearInterval(timerInterval);
+        return;
+      }
+
+      const days = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000);
+
+      document.getElementById('timer').innerHTML =
+        `${days}일 ${hours}시간 ${minutes}분 ${seconds}초`;
+    }
+
+    const timerInterval = setInterval(updateTimer, 1000);
+    updateTimer();
+
+    // 떨어지는 텍스트 생성 함수
+    function createFallingText() {
+      const fallingContainer = document.querySelector('.falling-text-container');
+      const pileContainer = document.querySelector('.pile-container');
+      const names = ["현주형", "준서이헴", "은식", "뽁", "대승불교", "재샤쓰", "준수"];
+      const text = names[Math.floor(Math.random() * names.length)];
+      
+      const span = document.createElement('span');
+      span.classList.add('falling-text');
+      span.textContent = text;
+      
+      // 화면 전체에서 랜덤한 수평 위치 지정
+      const left = Math.random() * 100;
+      span.style.left = left + '%';
+      
+      // 애니메이션 지속시간과 시작 지연시간을 랜덤하게 설정
+      const duration = 5 + Math.random() * 10;
+      span.style.animationDuration = duration + 's';
+      
+      const delay = Math.random() * 10;
+      span.style.animationDelay = delay + 's';
+      
+      fallingContainer.appendChild(span);
+      
+      // 애니메이션 종료 시, 해당 텍스트를 제거하고 바닥에 파란색 텍스트로 추가
+      span.addEventListener('animationend', function() {
+        span.remove();
+        const piledSpan = document.createElement('span');
+        piledSpan.classList.add('piled-text');
+        piledSpan.textContent = text;
+        pileContainer.appendChild(piledSpan);
+      });
+    }
+
+    // 0.5초마다 새로운 떨어지는 텍스트 생성
+    setInterval(createFallingText, 500);
+
+    // 배경 이미지 순환 (2초 간격)
+    const bgImages = ["1.png", "2.png", "3.png"];
+    let currentIndex = 0;
+    setInterval(() => {
+      currentIndex = (currentIndex + 1) % bgImages.length;
+      document.getElementById("bg-image").src = bgImages[currentIndex];
+    }, 2000);
+  </script>
+</body>
+</html>
