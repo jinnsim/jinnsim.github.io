@@ -41,6 +41,24 @@
       bottom: 20%;
       width: 30%;
     }
+    /* 가로 배경 이미지 컨테이너 */
+    .horizontal-background {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      z-index: -3;
+      pointer-events: none;
+    }
+    .horizontal-background img {
+      max-width: 30%;
+      height: auto;
+      opacity: 0.3;
+    }
     /* 떨어지는 텍스트 컨테이너 */
     .falling-text-container {
       position: fixed;
@@ -97,23 +115,6 @@
     .content.loaded {
       opacity: 1;
     }
-    /* 웹채팅 컨테이너 스타일 */
-    .chat-container {
-      position: fixed;
-      bottom: 10px;
-      right: 10px;
-      width: 320px;
-      height: 480px;
-      border: 1px solid #ccc;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-      z-index: 1000;
-      background-color: #fff;
-    }
-    .chat-container iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
   </style>
 </head>
 <body>
@@ -122,90 +123,12 @@
     <img src="https://mblogthumb-phinf.pstatic.net/MjAyNDA3MTNfMjc3/MDAxNzIwODI4NDE5NDQz.eonliuZzlleiXIF4rRIg4JX2vcPRfh8tjKtJfUw_cDgg.bfrIHJmAyUB5T8K_FWP2MZFOjlztYHHfjxuEyT4V8Nsg.JPEG/SE-f41677c9-1c0f-40ac-94ad-566c0f90a40d.jpg?type=w800" alt="숙대피기 대표메뉴" class="menu-image">
     <img src="https://simg.pstatic.net/static.map/v2/map/staticmap.bin?caller=smarteditor&markers=color%3A0x11cc73%7Csize%3Amid%7Cpos%3A126.973113%2037.543542%7CviewSizeRatio%3A0.7%7Ctype%3Ad&w=562&h=300&scale=2&dataversion=173.30" alt="약도" class="map-image">
   </div>
-
-  <!-- 떨어지는 텍스트와 바닥에 쌓이는 텍스트 컨테이너 -->
-  <div class="falling-text-container"></div>
-  <div class="pile-container"></div>
-
-  <!-- 메인 컨텐츠 -->
-  <div class="content">
-    <h1>2025년 4월 3일 저녁 7시까지 남은 시간</h1>
-    <h1>현주형,준서이헴,은식,뽁,대승불교,재샤쓰,준수</h1>
-    <div id="timer"></div>
+  
+  <!-- 가로 배경 이미지 컨테이너 -->
+  <div class="horizontal-background">
+    <img src="1.png" alt="Background 1">
+    <img src="2.png" alt="Background 2">
+    <img src="3.png" alt="Background 3">
   </div>
 
-  <!-- 웹채팅 iframe 컨테이너 -->
-  <div class="chat-container">
-    <!-- tlk.io 공개채팅 방 예시 (채팅 방 이름은 원하는 대로 변경 가능) -->
-    <iframe src="https://tlk.io/sukdaepigi" title="Web Chat"></iframe>
-  </div>
-
-  <script>
-    // 페이지 로드 시 컨텐츠 페이드 인 효과
-    window.addEventListener('load', () => {
-      document.querySelector('.content').classList.add('loaded');
-    });
-
-    // 카운트다운 타이머 업데이트 함수
-    function updateTimer() {
-      const targetDate = new Date('2025-04-03T19:00:00');
-      const currentDate = new Date();
-      const timeDifference = targetDate - currentDate;
-
-      if (timeDifference <= 0) {
-        document.getElementById('timer').innerHTML = '카운트다운이 종료되었습니다.';
-        clearInterval(timerInterval);
-        return;
-      }
-
-      const days = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000);
-
-      document.getElementById('timer').innerHTML =
-        `${days}일 ${hours}시간 ${minutes}분 ${seconds}초`;
-    }
-
-    const timerInterval = setInterval(updateTimer, 1000);
-    updateTimer();
-
-    // 떨어지는 텍스트 생성 함수
-    function createFallingText() {
-      const fallingContainer = document.querySelector('.falling-text-container');
-      const pileContainer = document.querySelector('.pile-container');
-      const names = ["현주형", "준서이헴", "은식", "뽁", "대승불교", "재샤쓰", "준수"];
-      const text = names[Math.floor(Math.random() * names.length)];
-      
-      const span = document.createElement('span');
-      span.classList.add('falling-text');
-      span.textContent = text;
-      
-      // 화면 전체에서 랜덤한 수평 위치 지정
-      const left = Math.random() * 100;
-      span.style.left = left + '%';
-      
-      // 애니메이션 지속시간과 시작 지연시간을 랜덤하게 설정
-      const duration = 5 + Math.random() * 10;
-      span.style.animationDuration = duration + 's';
-      
-      const delay = Math.random() * 10;
-      span.style.animationDelay = delay + 's';
-      
-      fallingContainer.appendChild(span);
-      
-      // 애니메이션 종료 시, 해당 텍스트를 제거하고 바닥에 파란색 텍스트로 추가
-      span.addEventListener('animationend', function() {
-        span.remove();
-        const piledSpan = document.createElement('span');
-        piledSpan.classList.add('piled-text');
-        piledSpan.textContent = text;
-        pileContainer.appendChild(piledSpan);
-      });
-    }
-
-    // 0.5초마다 새로운 떨어지는 텍스트 생성
-    setInterval(createFallingText, 500);
-  </script>
-</body>
-</html>
+  <!-- 떨어지는 텍스트와 바닥에
