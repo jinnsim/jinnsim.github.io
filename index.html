@@ -2,189 +2,74 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>카운트다운 타이머</title>
+  <title>Webull Market Data</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      background-color: #f0f0f0;
-      margin: 0;
-      padding-top: 50px;
-      position: relative;
-      overflow: hidden;
-    }
-    #timer {
-      font-size: 2em;
-      color: #333;
-    }
-    /* 배경 이미지 컨테이너 (가장 뒤에 표시) */
-    .background-images {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: -2;
-      pointer-events: none;
-    }
-    .background-images img {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      opacity: 0.3; /* 낮은 투명도로 배경 이미지 효과 */
-      top: 0;
-      left: 0;
-    }
-    /* 떨어지는 텍스트 컨테이너 */
-    .falling-text-container {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      overflow: hidden;
-      z-index: -1; /* 배경 이미지 위, 컨텐츠 뒤 */
-    }
-    /* 바닥에 쌓이는 텍스트 컨테이너 */
-    .pile-container {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      pointer-events: none;
-      text-align: center;
-      padding-bottom: 10px;
-    }
-    /* 떨어지는 텍스트 스타일 (빨간색) */
-    .falling-text {
-      position: absolute;
-      font-size: 1.5em;
-      color: red;
-      opacity: 0; /* 초기 투명 */
-      animation: fall linear forwards;
-    }
-    @keyframes fall {
-      0% {
-        transform: translateY(-100px);
-        opacity: 0;
-      }
-      20% {
-        opacity: 1;
-      }
-      100% {
-        transform: translateY(100vh);
-        opacity: 0;
-      }
-    }
-    /* 바닥에 쌓인 텍스트 스타일 (파란색) */
-    .piled-text {
-      display: inline-block;
-      font-size: 1.5em;
-      color: blue;
-      margin: 2px;
-    }
-    .content {
-      opacity: 0;
-      transition: opacity 0.5s ease-in;
-    }
-    .content.loaded {
-      opacity: 1;
-    }
+    body { font-family: sans-serif; }
+    #output { margin-top: 20px; }
+    .section { margin-bottom: 10px; }
   </style>
 </head>
 <body>
-  <!-- 배경 이미지 컨테이너: 하나의 img 태그 사용 -->
-  <div class="background-images">
-    <img id="bg-image" src="1.png" alt="Background">
-  </div>
-
-  <!-- 떨어지는 텍스트와 바닥에 쌓이는 텍스트 컨테이너 -->
-  <div class="falling-text-container"></div>
-  <div class="pile-container"></div>
-
-  <!-- 메인 컨텐츠 -->
-  <div class="content">
-    <h1>2025년 4월 3일 저녁 7시까지 남은 시간</h1>
-    <h1>현주형,준서이헴,은식,뽁,대승불교,재샤쓰,준수</h1>
-    <div id="timer"></div>
-  </div>
-
+  <h1>Webull Market Data</h1>
+  <input type="text" id="ticker" placeholder="티커 입력 (예: AAPL)" />
+  <button id="fetchData">데이터 가져오기</button>
+  
+  <div id="output"></div>
+  
   <script>
-    // 페이지 로드 시 컨텐츠 페이드 인 효과
-    window.addEventListener('load', () => {
-      document.querySelector('.content').classList.add('loaded');
-    });
-
-    // 카운트다운 타이머 업데이트 함수
-    function updateTimer() {
-      const targetDate = new Date('2025-04-03T19:00:00');
-      const currentDate = new Date();
-      const timeDifference = targetDate - currentDate;
-
-      if (timeDifference <= 0) {
-        document.getElementById('timer').innerHTML = '카운트다운이 종료되었습니다.';
-        clearInterval(timerInterval);
+    document.getElementById('fetchData').addEventListener('click', function() {
+      const ticker = document.getElementById('ticker').value.trim();
+      if (!ticker) {
+        alert('티커를 입력하세요.');
         return;
       }
-
-      const days = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((timeDifference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000);
-
-      document.getElementById('timer').innerHTML =
-        `${days}일 ${hours}시간 ${minutes}분 ${seconds}초`;
-    }
-
-    const timerInterval = setInterval(updateTimer, 1000);
-    updateTimer();
-
-    // 떨어지는 텍스트 생성 함수
-    function createFallingText() {
-      const fallingContainer = document.querySelector('.falling-text-container');
-      const pileContainer = document.querySelector('.pile-container');
-      const names = ["현주형", "준서이헴", "은식", "뽁", "대승불교", "재샤쓰", "준수"];
-      const text = names[Math.floor(Math.random() * names.length)];
       
-      const span = document.createElement('span');
-      span.classList.add('falling-text');
-      span.textContent = text;
+      // Webull의 티커 페이지 URL (실제 URL 구조는 Webull 사이트에 따라 다를 수 있습니다)
+      const url = `https://www.webull.com/quote/${ticker}`;
       
-      // 화면 전체에서 랜덤한 수평 위치 지정
-      const left = Math.random() * 100;
-      span.style.left = left + '%';
-      
-      // 애니메이션 지속시간과 시작 지연시간을 랜덤하게 설정
-      const duration = 5 + Math.random() * 10;
-      span.style.animationDuration = duration + 's';
-      
-      const delay = Math.random() * 10;
-      span.style.animationDelay = delay + 's';
-      
-      fallingContainer.appendChild(span);
-      
-      // 애니메이션 종료 시, 해당 텍스트를 제거하고 바닥에 파란색 텍스트로 추가
-      span.addEventListener('animationend', function() {
-        span.remove();
-        const piledSpan = document.createElement('span');
-        piledSpan.classList.add('piled-text');
-        piledSpan.textContent = text;
-        pileContainer.appendChild(piledSpan);
-      });
-    }
-
-    // 0.5초마다 새로운 떨어지는 텍스트 생성
-    setInterval(createFallingText, 500);
-
-    // 배경 이미지 순환 (2초 간격)
-    const bgImages = ["1.png", "2.png", "3.png"];
-    let currentIndex = 0;
-    setInterval(() => {
-      currentIndex = (currentIndex + 1) % bgImages.length;
-      document.getElementById("bg-image").src = bgImages[currentIndex];
-    }, 2000);
+      // fetch 요청 (CORS 문제로 브라우저에서 직접 요청이 안될 수 있음)
+      fetch(url)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('네트워크 응답이 정상이 아닙니다.');
+          }
+          return response.text();
+        })
+        .then(html => {
+          // 응답 HTML을 DOMParser로 파싱
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(html, 'text/html');
+          
+          // 데이터 추출 (여기서는 가상의 클래스명을 사용)
+          function getMarketData(sectionSelector) {
+            const section = doc.querySelector(sectionSelector);
+            if (section) {
+              const price = section.querySelector('.price') ? section.querySelector('.price').innerText : 'N/A';
+              const change = section.querySelector('.change') ? section.querySelector('.change').innerText : 'N/A';
+              return { price, change };
+            }
+            return { price: 'N/A', change: 'N/A' };
+          }
+          
+          const preMarket = getMarketData('.pre-market');
+          const regular   = getMarketData('.regular');
+          const afterHours = getMarketData('.after-hours');
+          const night      = getMarketData('.night');
+          
+          // 결과 출력
+          document.getElementById('output').innerHTML = `
+            <h2>${ticker.toUpperCase()}</h2>
+            <div class="section"><strong>프리장:</strong> 가격: ${preMarket.price}, 등락: ${preMarket.change}</div>
+            <div class="section"><strong>본장:</strong> 가격: ${regular.price}, 등락: ${regular.change}</div>
+            <div class="section"><strong>애프터장:</strong> 가격: ${afterHours.price}, 등락: ${afterHours.change}</div>
+            <div class="section"><strong>나이트장:</strong> 가격: ${night.price}, 등락: ${night.change}</div>
+          `;
+        })
+        .catch(error => {
+          console.error('데이터 가져오기 실패:', error);
+          document.getElementById('output').innerText = '데이터를 가져오지 못했습니다.';
+        });
+    });
   </script>
 </body>
 </html>
