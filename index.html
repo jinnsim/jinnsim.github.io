@@ -24,10 +24,9 @@
         return;
       }
       
-      // Webull의 티커 페이지 URL (실제 URL 구조는 Webull 사이트에 따라 다를 수 있습니다)
+      // Webull 티커 페이지 URL. (실제 URL 형식은 변경될 수 있음)
       const url = `https://www.webull.com/quote/${ticker}`;
       
-      // fetch 요청 (CORS 문제로 브라우저에서 직접 요청이 안될 수 있음)
       fetch(url)
         .then(response => {
           if (!response.ok) {
@@ -36,27 +35,29 @@
           return response.text();
         })
         .then(html => {
-          // 응답 HTML을 DOMParser로 파싱
+          // HTML 파싱
           const parser = new DOMParser();
           const doc = parser.parseFromString(html, 'text/html');
           
-          // 데이터 추출 (여기서는 가상의 클래스명을 사용)
-          function getMarketData(sectionSelector) {
-            const section = doc.querySelector(sectionSelector);
+          // 최신 Webull 페이지에서 각 시장 정보를 담은 컨테이너 선택자
+          // (예시: 프리장은 .market-pre, 본장은 .market-regular,
+          //  애프터장은 .market-after, 나이트장은 .market-night)
+          function getMarketData(selector) {
+            const section = doc.querySelector(selector);
             if (section) {
-              const price = section.querySelector('.price') ? section.querySelector('.price').innerText : 'N/A';
-              const change = section.querySelector('.change') ? section.querySelector('.change').innerText : 'N/A';
+              // 가격과 등락 정보가 각각 .price와 .change 요소 내에 있다고 가정
+              const price = section.querySelector('.price') ? section.querySelector('.price').innerText.trim() : 'N/A';
+              const change = section.querySelector('.change') ? section.querySelector('.change').innerText.trim() : 'N/A';
               return { price, change };
             }
             return { price: 'N/A', change: 'N/A' };
           }
           
-          const preMarket = getMarketData('.pre-market');
-          const regular   = getMarketData('.regular');
-          const afterHours = getMarketData('.after-hours');
-          const night      = getMarketData('.night');
+          const preMarket = getMarketData('.market-pre');
+          const regular   = getMarketData('.market-regular');
+          const afterHours = getMarketData('.market-after');
+          const night      = getMarketData('.market-night');
           
-          // 결과 출력
           document.getElementById('output').innerHTML = `
             <h2>${ticker.toUpperCase()}</h2>
             <div class="section"><strong>프리장:</strong> 가격: ${preMarket.price}, 등락: ${preMarket.change}</div>
