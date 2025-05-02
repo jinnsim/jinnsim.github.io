@@ -1,1 +1,184 @@
-<img src=4.png>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Chrome Dino Clone</title>
+  <style>
+    html, body { margin:0; padding:0; overflow:hidden; background:#f7f7f7; }
+    canvas { display:block; background:#f7f7f7; touch-action:none; }
+    #score {
+      position:absolute; top:10px; right:20px;
+      font:16px monospace; color:#555; z-index:10;
+    }
+    #gameOver {
+      position:absolute; top:50%; left:50%;
+      transform:translate(-50%,-50%);
+      font:24px sans-serif; color:#555;
+      text-align:center; display:none;
+    }
+    #gameOver button {
+      margin-top:12px; padding:8px 16px; font-size:16px;
+    }
+    /* 숨겨진 이미지들 */
+    #dinoImg, #cactusImg { display: none; }
+  </style>
+</head>
+<body>
+
+<canvas id="canvas"></canvas>
+<div id="score">0</div>
+<div id="gameOver">
+  Game Over <br>
+  <button onclick="start()">Restart</button>
+</div>
+
+<!-- ①  runner.gif -->
+<img id="dinoImg" src="runner.gif" alt="dino">
+
+<!-- ② 장애물 -->
+<img id="cactusImg"
+     src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMCIgaGVpZ2h0PSI0MCI+PHJlY3QgeD0iNSIgeT0iMCIgd2lkdGg9IjEwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjNTU1Ii8+PC9zdmc+"
+     alt="cactus">
+
+<script>
+(function(){
+  const c         = document.getElementById('canvas'),
+        ctx       = c.getContext('2d'),
+        scoreEl   = document.getElementById('score'),
+        overEl    = document.getElementById('gameOver'),
+        dinoImg   = document.getElementById('dinoImg'),
+        cactusImg = document.getElementById('cactusImg');
+
+  let W, H, frame, speed, score, best, isNight, gameOver;
+  const gravity = 0.6;
+
+  const dino = { x:50, y:0, w:44, h:47, vy:0, jump:-12 };
+  let groundY;
+  let obstacles, spawnTimer;
+
+  function resize(){
+    W = c.width = window.innerWidth;
+    H = c.height = window.innerHeight;
+    groundY = H * 0.8;
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  function start(){
+    frame = 0;
+    speed = 6;
+    score = 0;
+    best = best||0;
+    isNight = false;
+    gameOver = false;
+    obstacles = [];
+    spawnTimer = 0;
+    dino.y = groundY - dino.h;
+    dino.vy = 0;
+    overEl.style.display = 'none';
+    scoreEl.textContent = score;
+    loop();
+  }
+
+  // 글로벌로 노출
+  window.start = start;
+
+  function update(){
+    frame++;
+    if(frame % 5 === 0){
+      score++;
+      scoreEl.textContent = score;
+      if(score>0 && score % 800 === 0) isNight = !isNight;
+      if(score % 1000 === 0) speed += 1;
+    }
+
+    // 점프 물리
+    dino.vy += gravity;
+    dino.y += dino.vy;
+    if(dino.y > groundY - dino.h){
+      dino.y = groundY - dino.h;
+      dino.vy = 0;
+    }
+
+    // 장애물 생성
+    spawnTimer++;
+    if(spawnTimer > 90 - Math.min(50, speed * 3)){
+      spawnTimer = 0;
+      const h = 40 + Math.random()*30;
+      obstacles.push({
+        x: W + 20,
+        y: groundY - h,
+        w: 20 + Math.random()*10,
+        h: h
+      });
+    }
+
+    // 장애물 이동 & 충돌 체크
+    obstacles.forEach((o,i)=>{
+      o.x -= speed;
+      if(
+        dino.x < o.x + o.w &&
+        dino.x + dino.w > o.x &&
+        dino.y < o.y + o.h &&
+        dino.y + dino.h > o.y
+      ){
+        gameOver = true;
+      }
+      if(o.x + o.w < 0) obstacles.splice(i,1);
+    });
+
+    if(gameOver){
+      best = Math.max(best, score);
+      overEl.style.display = 'block';
+      scoreEl.textContent = `${score} (Best: ${best})`;
+    }
+  }
+
+  function draw(){
+    // 배경 (낮/밤)
+    ctx.fillStyle = isNight ? '#222' : '#f7f7f7';
+    ctx.fillRect(0,0,W,H);
+
+    // 지면 선
+    ctx.strokeStyle = isNight ? '#555' : '#ccc';
+    ctx.beginPath();
+    ctx.moveTo(0, groundY);
+    ctx.lineTo(W, groundY);
+    ctx.stroke();
+
+    // Runner
+    ctx.drawImage(dinoImg, dino.x, dino.y, dino.w, dino.h);
+
+    // 장애물 
+    obstacles.forEach(o => {
+      ctx.drawImage(cactusImg, o.x, o.y, o.w, o.h);
+    });
+  }
+
+  function loop(){
+    update();
+    draw();
+    if(!gameOver) requestAnimationFrame(loop);
+  }
+
+  // 터치/클릭 = 점프
+  window.addEventListener('pointerdown', () => {
+    if(gameOver) return;
+    if(dino.vy === 0) dino.vy = dino.jump;
+  });
+
+  // 이미지 로드 후 시작
+  let loaded = 0;
+  [dinoImg, cactusImg].forEach(img => {
+    img.onload = () => {
+      loaded++;
+      if(loaded === 2) start();
+    };
+  });
+
+})();
+</script>
+
+</body>
+</html>
